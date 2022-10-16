@@ -218,11 +218,14 @@ function CreateAirWave(ExtraHpMultiplier, SpeedMultiplier, WaveCount, FinalDesti
             Unit:SetTurnMult(SpeedMultiplier * 0.80)
             if ExtraHpMultiplier > 1 then
                 local Hp = Unit:GetMaxHealth()
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
+                if Unit:GetBlueprint().Veteran ~= nil then -- Look for VeteranTable -- Airscouts dont have Vet levels
+                    if Unit.Sync.VeteranLevel < 5 then -- if less then 5 then Set Veterancy
+                        VetLevelLeft = 5 - Unit.Sync.VeteranLevel
+                        for i = 1 , VetLevelLeft do
+                            Unit:SetVeterancy(1)
+                        end
+                    end
+                end
                 Unit:SetMaxHealth(Hp * ExtraHpMultiplier)
                 Unit:SetHealth(nil, (Hp * ExtraHpMultiplier))
             end
@@ -278,11 +281,14 @@ function CreateLandWave(ExtraHpMultiplier, SpeedMultiplier, WaveCount, FinalDest
             Unit:SetTurnMult(SpeedMultiplier)
             if ExtraHpMultiplier > 1 then
                 local Hp = Unit:GetMaxHealth()
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
+                if Unit:GetBlueprint().Veteran ~= nil then -- Look for VeteranTable -- Airscouts dont have Vet levels
+                    if Unit.Sync.VeteranLevel < 5 then -- if less then 5 then Set Veterancy
+                        VetLevelLeft = 5 - Unit.Sync.VeteranLevel
+                        for i = 1 , VetLevelLeft do
+                            Unit:SetVeterancy(1)
+                        end
+                    end
+                end
                 Unit:SetMaxHealth(Hp * ExtraHpMultiplier)
                 Unit:SetHealth(nil, (Hp * ExtraHpMultiplier))
             end
@@ -319,11 +325,14 @@ function CreateNavyWave(ExtraHpMultiplier, SpeedMultiplier, WaveCount, FinalDest
             Unit:SetTurnMult(SpeedMultiplier)
             if ExtraHpMultiplier > 1 then
                 local Hp = Unit:GetMaxHealth()
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
-                Unit:SetVeterancy(1)
+                if Unit:GetBlueprint().Veteran ~= nil then -- Look for VeteranTable -- Airscouts dont have Vet levels
+                    if Unit.Sync.VeteranLevel < 5 then -- if less then 5 then Set Veterancy
+                        VetLevelLeft = 5 - Unit.Sync.VeteranLevel
+                        for i = 1 , VetLevelLeft do
+                            Unit:SetVeterancy(1)
+                        end
+                    end
+                end
                 Unit:SetMaxHealth(Hp * ExtraHpMultiplier)
                 Unit:SetHealth(nil, (Hp * ExtraHpMultiplier))
             end

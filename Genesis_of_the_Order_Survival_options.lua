@@ -198,7 +198,7 @@ options =
 		},
 	},
 	{
-		default = 0,
+		default = 1,
 		label = "Enable GameBreakers",
 		help = "Disable or Enable Paragon and Yolona",
 		key = 'Option_GameBreaker',

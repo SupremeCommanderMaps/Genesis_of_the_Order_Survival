@@ -16,11 +16,14 @@ local ReinforcementDropTable = import(ScenarioInfo.MapPath .. 'Tables/Reinforcem
 local ArmyStrength = import(ScenarioInfo.MapPath .. 'Utilities/ArmyStrength.lua')
 local CircularPointGenerator = import(ScenarioInfo.MapPath .. 'Utilities/CircularPointGenerator.lua')
 local PlayDialogue = import(ScenarioInfo.MapPath .. 'Utilities/PlayDialogue.lua')
+local PingMarker = import(ScenarioInfo.MapPath .. 'Utilities/PingMarker.lua')
 local Markers = import(ScenarioInfo.MapPath .. 'Utilities/Markers.lua')
 local UnitCreator = import(ScenarioInfo.MapPath .. 'Utilities/UnitCreator.lua')
 
+
 WaveTableNumber = 1 --[[Default = 1]]-- 
 MaxWaveTableNumber = table.getn(ReinforcementDropTable.Tables)
+DoPingActive = false
 
 local BuildTime = ScenarioInfo.Options.Option_BuildTime
 
@@ -137,16 +140,43 @@ end
 
 function GiveUnits(Units)
     local SelectArmy = "Weakest"
-    local Army = ArmyStrength.GetArmy(SelectArmy)     
+    local Army = ArmyStrength.GetArmy(SelectArmy)  
+    local PositionTable = { }   
     ForkThread(function()
         WaitSeconds(2)
    
-        for x, Unit in Units do
+        for Every, Unit in Units do
+
+            local Position = Unit:GetPosition()
+
+            table.insert(PositionTable, Position)
+
             if not IsDestroyed(Unit) then 
                 ScenarioFramework.GiveUnitToArmy(Unit, Army)
             end
         end
+        DoPing(PositionTable)
     end)
+    
+end
+
+function DoPing(Table)
+    local ArmyNumber = table.getn(ListArmies()) - 4 -- Select Civ army
+
+
+    ForkThread(function()
+        while true do 
+            if DoPingActive == false then 
+                DoPingActive = true
+                PingMarker.getAlertMarkerReinforcementDrops(Table[1], ArmyNumber)
+                WaitSeconds(1.2)
+                DoPingActive = false
+                break
+            end
+            WaitSeconds(1)
+        end
+    end)
+
 end
 
 function RandomUnits(Table)

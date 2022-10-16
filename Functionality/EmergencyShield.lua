@@ -20,12 +20,12 @@ local ShieldBlueprint = {
 	MeshZ = '/effects/entities/Shield01/Shield01z_mesh',
 	RegenAssistMult = 60,
 	ShieldEnergyDrainRechargeTime = 60,
-	ShieldMaxHealth = 2300,
+	ShieldMaxHealth = 7500,
 	ShieldRechargeTime = 20,
-	ShieldRegenRate = 300,
+	ShieldRegenRate = 183,
 	ShieldRegenStartTime = 1,
-	ShieldSize = 16,
-	ShieldVerticalOffset = -2,
+	ShieldSize = 24,
+	ShieldVerticalOffset = -8,
 }
 
 
@@ -35,21 +35,34 @@ function EmergencyShield()
 
 	while true do    
         if Count > MaxCount then 
-            break
+            if EmergencyBeacon:ShieldIsOn() == false then 
+                EmergencyBeacon:SetMaxHealth(42)
+                EmergencyBeacon:SetHealth(nil, 42)
+                break
+            end
         end
-        
+
+   
+
         if EmergencyBeacon:ShieldIsOn() ~= true then
             if not EmergencyBeacon.Dead then
                 if DefenceObject.DefenceObject:GetHealth() < (DefenceObject.DefenceObject:GetMaxHealth() * 0.15) then           
                     EmergencyBeacon:CreateShield(ShieldBlueprint)
                     EmergencyBeacon:ShieldIsOn()
-                    EmergencyBeacon.MyShield:SetShieldRegenRate(300)
+                    
                     BroadcastMsg.TextMsg(string.rep(" ", 50) .. "", 25, '00D5FF', 3, 'centertop')
                     BroadcastMsg.TextMsg(string.rep(" ", 50) .. "Emergency shield active:" .. Count .. "/" .. MaxCount , 25, '00D5FF', 3, 'centertop')
                     Count = Count + 1
                 end
             end
 		end
+        if EmergencyBeacon:ShieldIsOn() == true then 
+            local CurrentHpShield = EmergencyBeacon.MyShield:GetHealth()
+            local MaxHpShield = EmergencyBeacon.MyShield:GetMaxHealth()
+            EmergencyBeacon:SetCustomName("Shield: " .. string.format("%.0f", CurrentHpShield) .. "/" .. string.format("%.0f", MaxHpShield) .. " +" .. ShieldBlueprint.ShieldRegenRate .. "Shield: " .. Count - 1 .. "/" .. MaxCount )
+            EmergencyBeacon:SetHealth(nil, CurrentHpShield)
+            EmergencyBeacon:SetMaxHealth(MaxHpShield)
+        end
 	WaitSeconds(1.0)	
     end
 end
@@ -65,6 +78,7 @@ function SpawnEmergencyBeacon()
 	EmergencyBeacon:SetCapturable(false)
     EmergencyBeacon:SetDoNotTarget(true)
     EmergencyBeacon.CanBeKilled = false
+    EmergencyBeacon:SetProductionPerSecondEnergy(50)
 
     ForkThread(EmergencyShield)
 end

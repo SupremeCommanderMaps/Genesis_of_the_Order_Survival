@@ -26,7 +26,6 @@ All assets are licensed with [CC-BY-NC-SA 4.0](https://creativecommons.org/licen
 
 --[[ Bugs ]]--
 No Known bugs
-Dialogue playing twice when com and battleship dies
 
 --[[ Future Plans ]]--
 
@@ -39,7 +38,6 @@ Make a Check: if A factory can build unit or els restrict unit
 Make a Check: vanilla unit stats . Use that for Mod check values
 
 Move DefencObject and emergencyshield to Events 
-  more hp on E shield
 
 --[[ Changelog ]]--
 
@@ -153,6 +151,7 @@ Move DefencObject and emergencyshield to Events
 *    Hydro and Mex better visible now
 
 ---- Version 18 ----
+*   02-10-2022
 *  Game Options
 *    Resources Settings
 *      Default Resources
@@ -205,4 +204,35 @@ Move DefencObject and emergencyshield to Events
 *  WelcomeMessage
 *    ShowBriefing in a DialogueBox Right side of screen 
 
+---- Version 19 ----
+*   14-10-2022
+*   ReinForcementDrop
+*       Does a Alert Ping when Dropped units have bin given to player
+*   AeonBoss
+*       On Stage 2 Tractor Claws disabled
+*       On Stage 2/3 
+*       Added 2 Sacus in UpperArms
+*       Added MovementThread now switches between AggresiveMove and Move order
+*           When on move order eye cannon disabled
+*   WelcomeMessage
+*       Added Extra Units option to message
+*       Added Extra Resources option to message
+*       Added GameBreakers to message
+*       Changed Position of Text and Brighter Color
+*   EmergencyShield
+*       Shield HP / Shield Max HP in Quantum Gate Beacon CustomName
+*       Emergency Quantum Gate Beacon HP shows Shield Hp / Shield Max Hp
+*       Added +50 Enegry production. Should fix E Shield depletion bug
+*   Recall
+*       Added End message when recalled 
+*       Objectives showing Completed when recalled  
+*       When recalled Summit objective set to complete should fix the failing when winning 
+*   SeraphimRifts
+*       Land and Navy Rift have Different Interval Checks for building new one if destroyed
+*       Initial Rift Spawns decreased by RiftCount - (Playercount + 2) Now Rifts will build during the game. Should fix Game speed when Sera and Aeon are attacking together.
+*   SeraphimInvasion / UnitBuffer 
+*       Added Veterancy Check. Should fix script stop working when Sera t3 bomber spawns
+*   UnitBuffer 
+*       Shield Hp, Size Increases when Health Multipier Mod
+*       Weapon Damge Mod, Range Mod and Fire Rate mod
 

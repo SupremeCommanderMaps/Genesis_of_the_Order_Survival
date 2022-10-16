@@ -119,7 +119,7 @@ function SpawnBoss()
 
 		EndBossThread(Stage)					--MainThread
 		ShieldThread()							--ShieldThread
-		DistanceCheckToDefenceObject()			--DistanceThread
+		DistanceCheckToDefenceObject(Stage)			--DistanceThread
 
 		CreateVisibleAreaAtUnit(20, EndBoss, 0, PlayerArmies)
 	end
@@ -128,13 +128,21 @@ function SpawnBoss()
 		EndBoss:SetHealth(nil, EndBoss:GetMaxHealth())
 		EndBoss:SetRegen(50 * HealthMultiplier * DificultyMultiplier)
 
+
+		Weapon2 = EndBoss:GetWeapon(2) -- Vacuum Gun
+		Weapon2:SetWeaponEnabled(false)
+		Weapon3 = EndBoss:GetWeapon(3) -- Vacuum Gun
+		Weapon3:SetWeaponEnabled(false)
+
 		LegModule(Army, Position)				--TransportShipArmor
 		ArmModule(Army, Position)				--Tanks
+		ArmModule2(Army, Position)				--Sacus Sera		
 		ShoulderModule2(Army, Position) 		--AntiAir
 		HeadModule(Army, Position)				--ShielDisruptor
 
+		MovementThread(Stage)						--15 seconds AggresiveMove Eye Cannon Active. 5 seconds MoveOrder Ete Cannon Disabled.
 		EndBossThread(Stage)					--MainThread
-		DistanceCheckToDefenceObject()			--DistanceThread
+		DistanceCheckToDefenceObject(Stage)			--DistanceThread
 
 		CreateVisibleAreaAtUnit(20, EndBoss, 0, PlayerArmies)
 	end
@@ -145,17 +153,18 @@ function SpawnBoss()
 
 		LegModule(Army, Position)				--TransportShipArmor
 		ArmModule(Army, Position)				--Tanks
+		ArmModule2(Army, Position)				--Sacus Sera	
 		TorsoModule(Army, Position)				--Arty
 		TorsoModule2(Army, Position)			--AntiAirSam
 		ShoulderModule1(Army, Position)			--Nuke
 		ShoulderModule2(Army, Position) 		--AntiAir
 		HeadModule(Army, Position)				--ShielDisruptor
 	
-
+		MovementThread(Stage)						--15 seconds AggresiveMove Eye Cannon Active. 5 seconds MoveOrder Ete Cannon Disabled.
 		EndBossThread(Stage)					--MainThread
 		ProtectionStormThread(Army)				--RegenStorm
 		NukeLaunchersThread()					--NukeThread
-		DistanceCheckToDefenceObject()			--DistanceThread
+		DistanceCheckToDefenceObject(Stage)			--DistanceThread
 
 		if ScenarioInfo.Options.Option_PlatoonWaveCount == 3 then
 			ArmModule(Army, Position)			--Tanks
@@ -172,11 +181,13 @@ function SpawnBoss()
 
 	--LegModule(Army, Position)					--TransportShipArmor
 	--ArmModule(Army, Position)					--Tanks
+	--ArmModule2(Army, Position)				--Sacus Sera
 	--TorsoModule(Army, Position)				--Arty
 	--ShoulderModule1(Army, Position)			--Nuke
 	--ShoulderModule2(Army, Position) 			--AntiAir
 	--HeadModule(Army, Position)				--ShielDisruptor
 
+	--MovementThread(Stage)						--15 seconds AggresiveMove Eye Cannon Active. 5 seconds MoveOrder Ete Cannon Disabled.
 	--EndBossThread()							--MainThread
 	--ProtectionStormThread(Army)				--RegenStorm
 	--NukeLaunchersThread()						--NukeThread
@@ -184,10 +195,7 @@ function SpawnBoss()
 	
 	
 	Stage = Stage + 1
-
-
 end
-
 
 function LegModule(Army, Position)
 	--TransportShips on legs
@@ -235,7 +243,7 @@ function ArmModule(Army, Position)
 	Arm1:SetDoNotTarget(true)
 	Arm2:AttachTo(EndBoss, 'Right_Arm_Muzzle01')
 	Arm2:GetWeaponCount()
-	Arm2Weapon1 = Arm2:GetWeapon(1)
+	Arm2Weapon1 = Arm1:GetWeapon(1)
 	Arm2Weapon1:ChangeMaxRadius(19 + 12 * Stage)
 	Arm2Weapon1:ChangeDamage(120 * DificultyMultiplier * DamageMultiplier * Stage)
 	Arm2Weapon1:SetFiringRandomness(0)
@@ -253,6 +261,64 @@ function ArmModule(Army, Position)
 	table.insert(SetCanBeKilledTable, Arm2)
 end
 
+function ArmModule2(Army, Position)
+	-- Sacu in Upper Arms -- Tractor Claws
+	-----------------------------------------------------------------------------------------------
+	Arm3 = CreateUnitHPR('XSL0301', Army, Position[1], Position[2], Position[3], 1, 0, 0)
+	Arm3.ImmuneToStun = true
+	Arm3:SetCustomName("ArmModule3")
+	Arm3:AttachTo(EndBoss, 'Left_Arm_B02')
+	Arm3:SetCanBeKilled(false)
+	Arm3:SetDoNotTarget(true)
+
+	Arm3:HideBone(3, true)
+	Arm3:HideBone(4, true)
+	Arm3:HideBone(5, true)
+	Arm3:HideBone(7, true)
+	Arm3:HideBone(8, true)
+	Arm3:HideBone(9, true)	
+	Arm3:HideBone(10, true)	
+	Arm3:HideBone(11, true)
+
+	Arm3Weapon1 = Arm3:GetWeapon(1)
+	Arm3Weapon1:SetFiringRandomness(0.0)
+	Arm3Weapon1:ChangeRateOfFire(10 * Stage)
+	Arm3Weapon1:ChangeMaxRadius(20 * Stage)
+	Arm3Weapon1:AddDamageMod(125 * DificultyMultiplier * DamageMultiplier * Stage)
+	-----------------------------------------------------------------------------------------------
+	Arm4 = CreateUnitHPR('XSL0301', Army, Position[1], Position[2], Position[3], 1, 0, 0)
+	Arm4.ImmuneToStun = true
+	Arm4:SetCustomName("ArmModule4")
+	Arm4:AttachTo(EndBoss, 'Right_Arm_B02')
+	Arm4:SetCanBeKilled(false)
+	Arm4:SetDoNotTarget(true)
+
+	Arm4:HideBone(3, true)
+	Arm4:HideBone(4, true)
+	Arm4:HideBone(5, true)
+	Arm4:HideBone(7, true)
+	Arm4:HideBone(8, true)
+	Arm4:HideBone(9, true)	
+	Arm4:HideBone(10, true)	
+	Arm4:HideBone(11, true)
+
+	Arm4Weapon1 = Arm4:GetWeapon(1)
+	Arm4Weapon1:SetFiringRandomness(0.0)
+	Arm4Weapon1:ChangeRateOfFire(10 * Stage)
+	Arm4Weapon1:ChangeMaxRadius(20 * Stage)
+	Arm4Weapon1:AddDamageMod(125 * DificultyMultiplier * DamageMultiplier * Stage)
+
+	local OldCreateProjectileAtMuzzle = Arm3Weapon1.CreateProjectileAtMuzzle
+	function CustomCreateProjectileAtMuzzle(self, muzzle)
+		local Projectile = OldCreateProjectileAtMuzzle(self, muzzle)
+		Projectile:SetLifetime(10)		
+	end
+	Arm3Weapon1.CreateProjectileAtMuzzle = CustomCreateProjectileAtMuzzle
+	Arm4Weapon1.CreateProjectileAtMuzzle = CustomCreateProjectileAtMuzzle
+
+	table.insert(SetCanBeKilledTable, Arm3)
+	table.insert(SetCanBeKilledTable, Arm4)
+end
 
 function TorsoModule(Army, Position)
 	-- Mobile Arty in Torso
@@ -460,7 +526,44 @@ function HeadModule(Army, Position)
 
 end
 
+function MovementThread(Stage)
+	ForkThread(
+		function()
+			while true do 
+				if EndBoss:IsDead() then
+					break
+				end
+				if not EndBoss:IsDead() then
+					local CurrentMoveLocation = EndBoss:GetCurrentMoveLocation()
+					Weapon1 = EndBoss:GetWeapon(1) -- Eye Cannon
+					Weapon1:SetWeaponEnabled(false)	-- turn it off 
 
+					WaitSeconds(1)
+					
+					Locations = GetNewLocations(CurrentMoveLocation)
+					IssueClearCommands({EndBoss})
+					for i, Position in Locations do 
+						IssueMove({EndBoss}, Position)
+					end
+				end
+				WaitSeconds(2.5 * Stage) -- 
+				if not EndBoss:IsDead() then
+					local CurrentMoveLocation = EndBoss:GetCurrentMoveLocation()
+					Weapon1 = EndBoss:GetWeapon(1) -- Eye Cannon
+					Weapon1:SetWeaponEnabled(true)	-- turn it on 
+					Weapon1:OnEnableWeapon(Weapon1:ResetTarget())
+					
+					WaitSeconds(1)
+					Locations = GetNewLocations(CurrentMoveLocation)
+					IssueClearCommands({EndBoss})
+					for i, Position in Locations do 
+						IssueAggressiveMove({EndBoss}, Position)
+					end
+				end
+				WaitSeconds(7.5 * Stage)
+			end
+		end)
+end
 
 function EndBossThread(Stage)
 	ForkThread(
@@ -607,7 +710,7 @@ function NukeLaunchersThread()
 	ForkThread(
 		function()
 			WaitSeconds(20)
-			LOG("IntervalCheck" ..  repr(Interval))
+			LOG("AeonBoss: Nuke Interval: " ..  repr(Interval))
 			while true do
 				if not EndBoss:IsDead() then
 					local POS = EndBoss:GetPosition()
@@ -688,38 +791,130 @@ function CreateVisibleAreaAtUnit(Radius, Unit, Duration, VisibleArmy)
     end
 end
 
-function DistanceCheckToDefenceObject()
+function DistanceCheckToDefenceObject(Stage)
 	local DefenceObjectLocation = ScenarioUtils.MarkerToPosition('defenceobject-1')
+	local Counter = 1
+	local AgressiveMove = true
 
 	ForkThread(
 		function()
 			while true do 
+				WaitSeconds(1)
 				if EndBoss:IsDead() then
 
 					break
+				end
+				if Counter == 5 then 
+					AgressiveMove = true
+				end
+				if Counter == 10 then
+					AgressiveMove = false
+					Counter = 0
 				end
 				if not EndBoss:IsDead() then
 					local CurrentBossPosition = EndBoss:GetPosition()
 					local DistanceToDefenceObject = VDist3(CurrentBossPosition, DefenceObjectLocation)
 
 					if DistanceToDefenceObject > 200 then
-						SetSpeedMultiplier(DistanceToDefenceObject)
+						SetSpeedMultiplier(DistanceToDefenceObject, AgressiveMove)
 					end
 				end
-
+				Counter = Counter + 1 
 				WaitSeconds(1)
 			end
 		end)
 end
 
-function SetSpeedMultiplier(DistanceToDefenceObject)
+function SetSpeedMultiplier(DistanceToDefenceObject, AgressiveMove)
 	local Value = (DistanceToDefenceObject * 0.01) * (DistanceToDefenceObject * 0.01)
 	EndBoss:SetSpeedMult(0.20375 * Value)
-	IssueAggressiveMove({EndBoss}, Location1)
-	IssueAggressiveMove({EndBoss}, Location2)
-	IssueAggressiveMove({EndBoss}, Location3)
-	IssueAggressiveMove({EndBoss}, Location4)
-	IssueAggressiveMove({EndBoss}, Location5)
-	IssueAggressiveMove({EndBoss}, Location6)
-	IssueAggressiveMove({EndBoss}, FinalDestination)
+	CurrentMoveLocation = EndBoss:GetCurrentMoveLocation()
+	if AgressiveMove == true then 
+		Locations = GetNewLocations(CurrentMoveLocation)
+		IssueClearCommands({EndBoss})
+		for i, Position in Locations do 
+			IssueMove({EndBoss}, Position)
+		end
+	end
+	if AgressiveMove == false then
+		Locations = GetNewLocations(CurrentMoveLocation)
+		IssueClearCommands({EndBoss})
+		for i, Position in Locations do 
+			IssueAggressiveMove({EndBoss}, Position)
+		end
+	end
+end
+
+function GetNewLocations(CurrentMoveLocation)
+	Progression = ComparePositions(CurrentMoveLocation)
+	NewLocationTable = { }
+	if Progression == 7 then 
+		table.insert(NewLocationTable, FinalDestination)
+		return NewLocationTable
+	elseif Progression == 6 then
+		table.insert(NewLocationTable, Location6)
+		table.insert(NewLocationTable, FinalDestination)
+		return NewLocationTable
+	elseif Progression == 5 then
+		table.insert(NewLocationTable, Location5)
+		table.insert(NewLocationTable, Location6)
+		table.insert(NewLocationTable, FinalDestination)
+		return NewLocationTable
+	elseif Progression == 4 then
+		table.insert(NewLocationTable, Location4)
+		table.insert(NewLocationTable, Location5)
+		table.insert(NewLocationTable, Location6)
+		table.insert(NewLocationTable, FinalDestination)
+		return NewLocationTable
+	elseif Progression == 3 then
+		table.insert(NewLocationTable, Location3)
+		table.insert(NewLocationTable, Location4)
+		table.insert(NewLocationTable, Location5)
+		table.insert(NewLocationTable, Location6)
+		table.insert(NewLocationTable, FinalDestination)
+		return NewLocationTable
+	elseif Progression == 2 then
+		table.insert(NewLocationTable, Location2)
+		table.insert(NewLocationTable, Location3)
+		table.insert(NewLocationTable, Location4)
+		table.insert(NewLocationTable, Location5)
+		table.insert(NewLocationTable, Location6)
+		table.insert(NewLocationTable, FinalDestination)
+		return NewLocationTable
+	else
+		table.insert(NewLocationTable, Location1)
+		table.insert(NewLocationTable, Location2)
+		table.insert(NewLocationTable, Location3)
+		table.insert(NewLocationTable, Location4)
+		table.insert(NewLocationTable, Location5)
+		table.insert(NewLocationTable, Location6)
+		table.insert(NewLocationTable, FinalDestination)
+		return NewLocationTable
+	end
+end
+
+function ComparePositions(CurrentMoveLocation)
+	if CurrentMoveLocation[1] == nil then
+		CurrentMoveLocation = Location1 
+	end
+	if CurrentMoveLocation[3] == nil then
+		CurrentMoveLocation = Location1 
+	end
+	local RoundPosX = string.format("%.0f", CurrentMoveLocation[1])
+	local RoundPosZ = string.format("%.0f", CurrentMoveLocation[3])
+	if RoundPosX == string.format("%.0f", Location1[1]) and RoundPosZ == string.format("%.0f", Location1[3]) then
+		return 1
+	elseif	RoundPosX == string.format("%.0f", Location2[1]) and RoundPosZ == string.format("%.0f", Location2[3]) then
+		return 2
+	elseif	RoundPosX == string.format("%.0f", Location3[1]) and RoundPosZ == string.format("%.0f", Location3[3]) then
+		return 3
+	elseif	RoundPosX == string.format("%.0f", Location4[1]) and RoundPosZ == string.format("%.0f", Location4[3]) then
+		return 4
+	elseif	RoundPosX == string.format("%.0f", Location5[1]) and RoundPosZ == string.format("%.0f", Location5[3]) then
+		return 5
+	elseif	RoundPosX == string.format("%.0f", Location6[1]) and RoundPosZ == string.format("%.0f", Location6[3]) then
+		return 6
+	else
+		return 7
+	end
 end

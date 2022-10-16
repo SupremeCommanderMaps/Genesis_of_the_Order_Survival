@@ -39,6 +39,9 @@ local SeraphimArmy = "ARMY_ENEMY_SERAPHIM"
 local InitialLandRiftCount = 0 
 local InitialNavyRiftCount = 0 
 
+local LandRiftBeingBuild = false
+local NavyRiftBeingBuild = false
+
 
 
 
@@ -46,10 +49,10 @@ function CreateRifts()
     InitialLandRiftCount = 2 + GameSetup.PlayerArmyCount * (DificultyMultiplier * 2)
     InitialNavyRiftCount = 0 + GameSetup.PlayerArmyCount * (DificultyMultiplier * 2)
 
-    for _ = 1, InitialLandRiftCount do
+    for _ = 1, (InitialLandRiftCount - (GameSetup.PlayerArmyCount + 2)) do
         CreateLandRift(1)
     end
-    for _ = 1, InitialNavyRiftCount do
+    for _ = 1, (InitialNavyRiftCount - (GameSetup.PlayerArmyCount + 2)) do
         CreateNavyRift(1)
     end
 
@@ -59,112 +62,139 @@ end
 
 
 function CreateLandRift(ExtraHpMultiplier)
-    ForkThread(
-        function()
-            WaitSeconds(6)
-            
-
-            local Position = Areas.GetRandomPositionInArea(Areas.SpawnLandRift)
-
-            local InvisibleUnitId = 'ueb5102'
-            local VisualEffect = CreateUnitHPR(InvisibleUnitId, SeraphimArmy, Position[1], Position[2], Position[3], 0, 0, 0)
-            VisualEffect.CanBeKilled = false
-
-            CreateVisibleAreaAtUnit(40, VisualEffect, 30, PlayerArmies)
-
-            for _ = 1, 10 do
-                VisualEffect:CreateProjectile('/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-                VisualEffect:CreateProjectile('/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-                WaitSeconds(2)
-
-                VisualEffect:CreateProjectile('/effects/Entities/SIFExperimentalStrategicMissileEffect03/SIFExperimentalStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-            end
-            for _ = 1, 4 do 
-                VisualEffect:CreateProjectile('/effects/Entities/SIFExperimentalStrategicMissileEffect01/SIFExperimentalStrategicMissileEffect01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-                WaitSeconds(2)
-            end
-
-            KillUnit(VisualEffect)
+    if LandRiftBeingBuild == false then
+        ForkThread(
+            function()
+                LandRiftBeingBuild = true
+                LOG("SeraphimRifts: CreateLandRift: ".. repr(LandRiftBeingBuild))
+                WaitSeconds(6)
 
 
+                local Position = Areas.GetRandomPositionInArea(Areas.SpawnLandRift)
 
-            if GameState == 0 then 
-                local LandRiftMainUnitId = 'xac1101'
-                local LandRift = CreateUnitHPR(LandRiftMainUnitId, SeraphimArmy, Position[1], Position[2], Position[3], 0, 0, 0)
-                LandRift:SetMaxHealth(675000 * DificultyMultiplier * HealthMultiplier * ExtraHpMultiplier)
-                LandRift:SetHealth(nil, LandRift:GetMaxHealth() * 0.65)
-                LandRift:SetRegenRate(300 * DificultyMultiplier * HealthMultiplier * ExtraHpMultiplier)
-                LandRift.CanBeKilled = true
-                LandRift:SetDoNotTarget(false)
-                LandRift:SetReclaimable(false)
-                LandRift:SetCapturable(false)
-                LandRift:SetCanTakeDamage(true)
-                LandRift:SetCustomName("Rift")       
-                CreateVisibleAreaAtUnit(40, LandRift, 0, PlayerArmies)   
-            end
-        end)
+                local InvisibleUnitId = 'ueb5102'
+                local VisualEffect = CreateUnitHPR(InvisibleUnitId, SeraphimArmy, Position[1], Position[2], Position[3], 0, 0, 0)
+                VisualEffect.CanBeKilled = false
+
+                CreateVisibleAreaAtUnit(40, VisualEffect, 30, PlayerArmies)
+
+                for _ = 1, 10 do
+                    VisualEffect:CreateProjectile('/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+                    VisualEffect:CreateProjectile('/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+                    WaitSeconds(2)
+
+                    VisualEffect:CreateProjectile('/effects/Entities/SIFExperimentalStrategicMissileEffect03/SIFExperimentalStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+                end
+                for _ = 1, 4 do 
+                    VisualEffect:CreateProjectile('/effects/Entities/SIFExperimentalStrategicMissileEffect01/SIFExperimentalStrategicMissileEffect01_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+                    WaitSeconds(2)
+                end
+
+                KillUnit(VisualEffect)
+
+
+
+                if GameState == 0 then 
+                    local LandRiftMainUnitId = 'xac1101'
+                    local LandRift = CreateUnitHPR(LandRiftMainUnitId, SeraphimArmy, Position[1], Position[2], Position[3], 0, 0, 0)
+                    LandRift:SetMaxHealth(675000 * DificultyMultiplier * HealthMultiplier * ExtraHpMultiplier)
+                    LandRift:SetHealth(nil, LandRift:GetMaxHealth() * 0.65)
+                    LandRift:SetRegenRate(300 * DificultyMultiplier * HealthMultiplier * ExtraHpMultiplier)
+                    LandRift.CanBeKilled = true
+                    LandRift:SetDoNotTarget(false)
+                    LandRift:SetReclaimable(false)
+                    LandRift:SetCapturable(false)
+                    LandRift:SetCanTakeDamage(true)
+                    LandRift:SetCustomName("Rift")       
+                    CreateVisibleAreaAtUnit(40, LandRift, 0, PlayerArmies)   
+                end
+                WaitSeconds(60)
+                LandRiftBeingBuild = false
+                LOG("SeraphimRifts: CreateLandRift: ".. repr(LandRiftBeingBuild))
+            end)
+
+    end
 end
 
 function CreateNavyRift(ExtraHpMultiplier)
-    ForkThread(
-        function()
-            WaitSeconds(6)
+    if NavyRiftBeingBuild == false then
+        ForkThread(
+            function()
+                NavyRiftBeingBuild = true
+                LOG("SeraphimRifts: CreateNavyRift: ".. repr(NavyRiftBeingBuild))
+                WaitSeconds(6)
 
-            local Position = Areas.GetRandomPositionInArea(Areas.SpawnNavyRift)
+                local Position = Areas.GetRandomPositionInArea(Areas.SpawnNavyRift)
 
-            local InvisibleUnitId = 'ueb5102'
-            local VisualEffect = CreateUnitHPR(InvisibleUnitId, SeraphimArmy, Position[1], Position[2], Position[3], 0, 0, 0)
-            VisualEffect.CanBeKilled = false
+                local InvisibleUnitId = 'ueb5102'
+                local VisualEffect = CreateUnitHPR(InvisibleUnitId, SeraphimArmy, Position[1], Position[2], Position[3], 0, 0, 0)
+                VisualEffect.CanBeKilled = false
 
-            CreateVisibleAreaAtUnit(40, VisualEffect, 30, PlayerArmies)
+                CreateVisibleAreaAtUnit(40, VisualEffect, 30, PlayerArmies)
 
-            for _ = 1, 10 do
-                VisualEffect:CreateProjectile('/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-                VisualEffect:CreateProjectile('/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-                WaitSeconds(2)
+                for _ = 1, 10 do
+                    VisualEffect:CreateProjectile('/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+                    VisualEffect:CreateProjectile('/effects/Entities/SIFInainoStrategicMissileEffect03/SIFInainoStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+                    WaitSeconds(2)
 
-                VisualEffect:CreateProjectile('/effects/Entities/SIFExperimentalStrategicMissileEffect03/SIFExperimentalStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-            end
-            for _ = 1, 4 do 
-                VisualEffect:CreateProjectile('/effects/Entities/SIFExperimentalStrategicMissileEffect03/SIFExperimentalStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
-                WaitSeconds(2)
-            end
+                    VisualEffect:CreateProjectile('/effects/Entities/SIFExperimentalStrategicMissileEffect03/SIFExperimentalStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+                end
+                for _ = 1, 4 do 
+                    VisualEffect:CreateProjectile('/effects/Entities/SIFExperimentalStrategicMissileEffect03/SIFExperimentalStrategicMissileEffect03_proj.bp', 0, 1.35, 0, nil, nil, nil):SetCollision(false)
+                    WaitSeconds(2)
+                end
 
-            KillUnit(VisualEffect)
+                KillUnit(VisualEffect)
 
-            if GameState == 0 then 
-                local NavyRiftMainUnitId = 'xsc2201'
-                local NavyRift = CreateUnitHPR(NavyRiftMainUnitId, SeraphimArmy, Position[1], Position[2], Position[3], 0, 0, 0)
-                NavyRift:SetMaxHealth(325000 * DificultyMultiplier * HealthMultiplier * ExtraHpMultiplier)
-                NavyRift:SetHealth(nil, NavyRift:GetMaxHealth() * 0.55)
-                NavyRift:SetRegenRate(150 * DificultyMultiplier * HealthMultiplier * ExtraHpMultiplier)
-                NavyRift.CanBeKilled = true
-                NavyRift:SetDoNotTarget(false)
-                NavyRift:SetReclaimable(false)
-                NavyRift:SetCapturable(false)
-                NavyRift:SetCanTakeDamage(true)
-                NavyRift:SetCustomName("Rift")     
-                CreateVisibleAreaAtUnit(40, NavyRift, 0, PlayerArmies)  
-            end
-        end)
+                if GameState == 0 then 
+                    local NavyRiftMainUnitId = 'xsc2201'
+                    local NavyRift = CreateUnitHPR(NavyRiftMainUnitId, SeraphimArmy, Position[1], Position[2], Position[3], 0, 0, 0)
+                    NavyRift:SetMaxHealth(325000 * DificultyMultiplier * HealthMultiplier * ExtraHpMultiplier)
+                    NavyRift:SetHealth(nil, NavyRift:GetMaxHealth() * 0.55)
+                    NavyRift:SetRegenRate(150 * DificultyMultiplier * HealthMultiplier * ExtraHpMultiplier)
+                    NavyRift.CanBeKilled = true
+                    NavyRift:SetDoNotTarget(false)
+                    NavyRift:SetReclaimable(false)
+                    NavyRift:SetCapturable(false)
+                    NavyRift:SetCanTakeDamage(true)
+                    NavyRift:SetCustomName("Rift")     
+                    CreateVisibleAreaAtUnit(40, NavyRift, 0, PlayerArmies)  
+                end
+                WaitSeconds(60)                
+                NavyRiftBeingBuild = false
+                LOG("SeraphimRifts: CreateNavyRift: ".. repr(NavyRiftBeingBuild))
+            end)
+    end
 end
 
 
 function RiftCountThread()
+    local IsLandRiftBuild = false
+
     local ExtraHpMultiplier = 1.00
-    local RiftCountThreadTickCounter = 0
+    local ExtraHpCounter = 0
+
+    local LandRiftTickCounter = 0
+    local NavyRiftTickCounter = 0
+
+    local LandRiftCountIntervalCheck = 190 - (DificultyMultiplier * (GameSetup.PlayerArmyCount * GameSetup.PlayerArmyCount))
+    local NavyRiftCountIntervalCheck = 250 - (DificultyMultiplier * (GameSetup.PlayerArmyCount * GameSetup.PlayerArmyCount))
+    
     ForkThread(
         function()
-            WaitSeconds(60) -- Wait or els more Rifts spawn in the start
+            WaitSeconds(60) -- Wait or els Rifts didnt spawn yet, and game will end becuase of it
             while true do 
-
-
                 local CurrentLandRiftCount = GetCurrentLandRiftCount()     
                 local CurrentNavyRiftCount = GetCurrentNavyRiftCount()  
 
-                ExtraHpMultiplier = ExtraHpMultiplier + 0.05
-   
-                if ScenarioInfo.Options.Option_EndlessMode == 0 then 
+                if ExtraHpCounter > 60 then  -- Every Minute add extra Hp to Base HP Rifts
+                    ExtraHpMultiplier = ExtraHpMultiplier + 0.05
+                    LOG("SeraphimRifts: LandRift TickCount: "..repr(LandRiftTickCounter).."/"..repr(LandRiftCountIntervalCheck).." NavyRift TickCount: "..repr(NavyRiftTickCounter).."/"..repr(NavyRiftCountIntervalCheck))
+                    LOG("SeraphimRifts: Current LandRift: "..repr(CurrentLandRiftCount).."/"..repr(InitialLandRiftCount).." Current NavyRift: "..repr(CurrentNavyRiftCount).."/"..repr(InitialNavyRiftCount).." ExtraHPMultiplier: ".. repr(ExtraHpMultiplier))
+                    ExtraHpCounter = 0
+                end
+
+                if ScenarioInfo.Options.Option_EndlessMode == 0 then -- If All Rifts are Killed Spawn Endless Recall
                     if CurrentLandRiftCount + CurrentNavyRiftCount == 0 then
                             GameState = 1
 
@@ -181,39 +211,23 @@ function RiftCountThread()
                     end
                 end
 
-                if RiftCountThreadTickCounter >= 15 / (DificultyMultiplier * GameSetup.PlayerArmyCount) then 
-                    LOG("SeraphimRifts: We Got New Rift? " .. repr(RiftCountThreadTickCounter))
-                    RandomNumber = Random(1,2)
-                    if RandomNumber == 1 then 
-                        if CurrentLandRiftCount < InitialLandRiftCount then
-                            CreateLandRift(ExtraHpMultiplier)
-                            RiftCountThreadTickCounter = 0
-                        end 
-                    else  
-                        if CurrentNavyRiftCount < InitialNavyRiftCount then
-                            CreateNavyRift(ExtraHpMultiplier)
-                            RiftCountThreadTickCounter = 0
-                        end 
-                    end
-                    if RandomNumber == 2 then 
-                        if CurrentLandRiftCount < InitialLandRiftCount then
-                            CreateNavyRift(ExtraHpMultiplier)
-                            RiftCountThreadTickCounter = 0
-                        end 
-                    else  
-                        if CurrentNavyRiftCount < InitialNavyRiftCount then
-                            CreateLandRift(ExtraHpMultiplier)
-                            RiftCountThreadTickCounter = 0
-                        end 
-                    end
+                if LandRiftTickCounter > LandRiftCountIntervalCheck  then 
+                    if CurrentLandRiftCount < InitialLandRiftCount then
+                        CreateLandRift(ExtraHpMultiplier)
+                        LandRiftTickCounter = 0
+                    end 
                 end
-                LOG("SeraphimRifts: Check1 " .. repr(RiftCountThreadTickCounter))
+                if NavyRiftTickCounter > NavyRiftCountIntervalCheck  then
+                    if CurrentNavyRiftCount < InitialNavyRiftCount then
+                        CreateNavyRift(ExtraHpMultiplier)
+                        NavyRiftTickCounter = 0
+                    end 
+                end
+                ExtraHpCounter = ExtraHpCounter + 1
+                LandRiftTickCounter = LandRiftTickCounter + 1
+                NavyRiftTickCounter = NavyRiftTickCounter + 1
 
-                RiftCountThreadTickCounter = RiftCountThreadTickCounter + 1
-
-                LOG("SeraphimRifts: Check2 " .. repr(RiftCountThreadTickCounter))
-
-                WaitSeconds(60)      
+                WaitSeconds(1)      
             end
         end)
 end

@@ -184,10 +184,15 @@ function RecallThread(PlayerArmies, RecallNumber)
         FirstRecallDialog = false
     end
 
-    if RecallNumber == 1 then
+    if RecallNumber == 1 then --[[When All Seraphim Rifts are killed Dialog]]--
         Dialog = {
             {displayTime = 900, text =
-            "Congratulation you beat the Game!!. \n I hope you enjoyed it.\n\n\nPlz give me a Review in the Map Vault.\n Commander Jammer out!",}
+            "\n\n\n\n\n\n\n",}
+        }
+        BroadcastMsg.DisplayDialogBox("right", Dialog, false)
+        Dialog = {
+            {displayTime = 900, text =
+            "It seems like all Rifts are sealed. \n\nYou can recall safely now.\n\nBut I am afraid we haven't seen the last of ZanGoattheZeGary!!. \n\n",}
         }
     end
 
@@ -261,7 +266,7 @@ function PlayerLocationThread(RecallPosition, RecallDistance, PlayerArmies)
                 -- if he has commander then 
                 if Commander then 
                     local Distance = VDist3(Commander:GetPosition(),RecallPosition)	
-                    if InsideRecallArea(Commander, Distance, RecallDistance) then
+                    if InsideRecallArea(Commander, Distance, RecallDistance, Army) then
                         InsideRecall[i] = {Commander.UnitId, true}   
                     else 
                         InsideRecall[i] = {Commander.UnitId, false}
@@ -278,8 +283,6 @@ function PlayerLocationThread(RecallPosition, RecallDistance, PlayerArmies)
 end
 
 function MakeFlashVisibleCommander(PlayerArmies)
-    local DestroyObjectiveTime = 80
-
     for i, Army in PlayerArmies do
         -- get commanders from player armies
         if ScenarioInfo.ArmySetup[Army].Human == true then 
@@ -290,6 +293,10 @@ function MakeFlashVisibleCommander(PlayerArmies)
                     { Units = {Commander}, MarkUnits = true, FlashVisible = true,})
                 ForkThread(function() 
                     while true do 
+                        if RecallState == 2 then 
+                            ScenarioInfo.MoveCommander1:ManualResult( true )
+                            break
+                        end
                         if RecallStop == 1 then 
                             ScenarioInfo.MoveCommander1:ManualResult( false )
                             break
@@ -304,6 +311,10 @@ function MakeFlashVisibleCommander(PlayerArmies)
                     { Units = {Commander}, MarkUnits = true, FlashVisible = true,})
                 ForkThread(function() 
                     while true do 
+                        if RecallState == 2 then 
+                            ScenarioInfo.MoveCommander2:ManualResult( true )
+                            break
+                        end
                         if RecallStop == 1 then 
                             ScenarioInfo.MoveCommander2:ManualResult( false )
                             break
@@ -318,6 +329,10 @@ function MakeFlashVisibleCommander(PlayerArmies)
                     { Units = {Commander}, MarkUnits = true, FlashVisible = true,})
                 ForkThread(function() 
                     while true do 
+                        if RecallState == 2 then 
+                            ScenarioInfo.MoveCommander3:ManualResult( true )
+                            break
+                        end
                         if RecallStop == 1 then 
                             ScenarioInfo.MoveCommander3:ManualResult( false )
                             break
@@ -332,6 +347,10 @@ function MakeFlashVisibleCommander(PlayerArmies)
                     { Units = {Commander}, MarkUnits = true, FlashVisible = true,})
                 ForkThread(function() 
                     while true do 
+                        if RecallState == 2 then 
+                            ScenarioInfo.MoveCommander4:ManualResult( true )
+                            break
+                        end
                         if RecallStop == 1 then 
                             ScenarioInfo.MoveCommander4:ManualResult( false )
                             break
@@ -346,6 +365,10 @@ function MakeFlashVisibleCommander(PlayerArmies)
                     { Units = {Commander}, MarkUnits = true, FlashVisible = true,})
                 ForkThread(function() 
                     while true do 
+                        if RecallState == 2 then 
+                            ScenarioInfo.MoveCommander5:ManualResult( true )
+                            break
+                        end
                         if RecallStop == 1 then 
                             ScenarioInfo.MoveCommander5:ManualResult( false )
                             break
@@ -359,9 +382,9 @@ function MakeFlashVisibleCommander(PlayerArmies)
 end
 
 
-function InsideRecallArea(Commander, Distance, RecallDistance)
+function InsideRecallArea(Commander, Distance, RecallDistance, Army)
     -- if inside return true
-    WriteTextDistanceCommanderToRecall(Commander, Distance, RecallDistance)
+    WriteTextDistanceCommanderToRecall(Commander, Distance, RecallDistance, Army)
     if Distance <= RecallDistance then 
         return true
     end
@@ -372,23 +395,30 @@ function InsideRecallArea(Commander, Distance, RecallDistance)
 end
 
 
-function WriteTextDistanceCommanderToRecall(Commander, Distance, RecallDistance)
+function WriteTextDistanceCommanderToRecall(Commander, Distance, RecallDistance, Army)
     local DistanceToRecall = Distance - RecallDistance
     local DistanceRound = math.round(DistanceToRecall * 19.5)
     if DistanceRound < 0 then 
         DistanceRound = 0
     end
 
-    local CommanderBrain = Commander.Army
-    local Nickname = GetArmyBrain(CommanderBrain).Nickname
-    local Name = string.sub(Nickname, 1, 6)
+    local Nickname = GetArmyBrain(Army).Nickname
+    local Name = "Error"
+    if Nickname ~= nil then 
+         Name = string.sub(Nickname, 1, 6)
+    end
 
     local ComFaction = Commander.factionCategory
-    local Faction = string.sub(ComFaction, 1, 4)
+    local Faction = "Error"
+    if ComFaction ~= nil then
+        Faction = string.sub(ComFaction, 1, 4)
+    end
 
-    local Army = 'ARMY_'.. GetArmyBrain(CommanderBrain).Army
     local BrainColour = import('/lua/GameColors.lua').GameColors.ArmyColors[ScenarioInfo.ArmySetup[Army].PlayerColor]
-    local Formatt = string.sub(BrainColour, 3)
+    local Formatt = "Error"
+    if BrainColour ~= nil then
+        Formatt = string.sub(BrainColour, 3)
+    end
 
     BroadcastMsg.TextMsg(string.rep(" ", 90) .. Name .. ": " .. Faction .. " Acu " .. DistanceRound .. " m", 20, Formatt, 1.0, 'centertop')
 end
@@ -405,11 +435,13 @@ function CheckAll(Table)
 end
 
 function VictoryWooopWooop()
+    ScenarioInfo.ProtectObject1:ManualResult( true )
     ForkThread(function()
         PlayDialogue.Dialogue(DialogueList.Entropy_10, nil, false) --Entropy: We've got a lock on your ACU. Almost there.
         for i, Army in PlayerArmies do
             TeleportCommander(Army)
         end
+
         PlayDialogue.Dialogue(DialogueList.Entropy_11, nil, false) --Entropy: That was damn close, Commander. Glad we got you out of there in one piece.
         WaitSeconds(5)
         for i, Army in PlayerArmies do
@@ -417,6 +449,21 @@ function VictoryWooopWooop()
             GetArmyBrain(Army):OnVictory()
 
         end
+        Dialog1 = {
+            {displayTime = 80, text =
+            " \n\n\n\n\n\n\n\n\n ",}
+        }
+        Dialog2 = {
+            {displayTime = 80, text =
+            "Good job, Commanders.\nRecall was successful.\nThe Order's project has bin destroyed.\n\n\n I hope you enjoyed the game.\nPlease give me a Review in the Map Vault.\n                  Commander Jammer out!",}
+        }
+
+        for z = 1, 5 do 
+            BroadcastMsg.DisplayDialogBox("right", Dialog1, false)
+        end
+        BroadcastMsg.DisplayDialogBox("right", Dialog2, false)
+
+
         for i, Army in EnemyArmies do 
             GetArmyBrain(Army):OnDefeat()
         end 

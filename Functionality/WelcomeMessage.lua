@@ -10,35 +10,30 @@ local Restrictions = import(ScenarioInfo.MapPath .. 'Functionality/Restrictions.
 
 
 function ShowWelcomeMessage()
-	
-	local Difficulty = nil
-	if ScenarioInfo.Options.Option_PlatoonWaveCount == 1 then
-		Difficulty = "Easy"
-	elseif ScenarioInfo.Options.Option_PlatoonWaveCount == 2 then
-		Difficulty = "Moderate"
-	elseif ScenarioInfo.Options.Option_PlatoonWaveCount == 3 then
-		Difficulty = "Hard"
-	end
 	ForkThread(function()
 		WaitSeconds(2.0) --WaitSeconds for GetModifiers to collect
 		BroadcastMsg.TextMsg(string.rep(" ", 57) .. "", 20, '2F4607', 20, 'lefttop')
+		BroadcastMsg.TextMsg(string.rep(" ", 57) .. "", 20, '2F4607', 20, 'lefttop')
+		BroadcastMsg.TextMsg(string.rep(" ", 57) .. "", 20, '2F4607', 20, 'lefttop')
+		BroadcastMsg.TextMsg(string.rep(" ", 57) .. "", 20, '2F4607', 20, 'lefttop')
 
+		BroadcastMsg.TextMsg(string.rep(" ", 23) .. "Genesis of the Order ", 36, '3DFC01', 20, 'lefttop')
+		BroadcastMsg.TextMsg(string.rep(" ", 63) .. "Version " .. ScenarioInfo.map_version, 25, '3DFC01', 20, 'lefttop')
+		BroadcastMsg.TextMsg(string.rep(" ", 39) .. "Difficulty: " .. GetDifficultyDialogue(), 20, '3DFC01', 20, 'lefttop')
+		BroadcastMsg.TextMsg(string.rep(" ", 39) .. "Enemy health: " .. (ScenarioInfo.Options.Option_HealthMultiplier * 100) .. "% Damage " .. (ScenarioInfo.Options.Option_DamageMultiplier * 100) .. "%", 20, '3DFC01', 20, 'lefttop')
+	    BroadcastMsg.TextMsg(string.rep(" ", 39) .. "Enemies spawn in: " .. ScenarioInfo.Options.Option_BuildTime .. " seconds", 20, '3DFC01', 20, 'lefttop')
+		BroadcastMsg.TextMsg(string.rep(" ", 39) .. "Extra Units: " .. GetAllFactionDialogue() .. "", 20, '3DFC01', 20, 'lefttop')
+		if ScenarioInfo.Options.Option_ResourcesSettings ~= 0 then 
+			BroadcastMsg.TextMsg(string.rep(" ", 39) .. "Resources: " .. GetResourcesDialogue() .. "", 20, '3DFC01', 20, 'lefttop')
+		end
+		if ScenarioInfo.Options.Option_GameBreaker ~= 0 then
+			BroadcastMsg.TextMsg(string.rep(" ", 39) .. "Restriction: " .. GetGameBreakerDialogue() .. "", 20, '3DFC01', 20, 'lefttop')
+		end
 
-
-		BroadcastMsg.TextMsg(string.rep(" ", 53) .. "Genesis of the Order ", 36, '77F550', 20, 'lefttop')
-		BroadcastMsg.TextMsg(string.rep(" ", 106) .. "Version " .. ScenarioInfo.map_version, 25, '77F550', 20, 'lefttop')
-
-		BroadcastMsg.TextMsg(string.rep(" ", 85) .. "Difficulty " .. Difficulty, 20, '77F550', 20, 'lefttop')
-		BroadcastMsg.TextMsg(string.rep(" ", 85) .. "Enemy health " .. (ScenarioInfo.Options.Option_HealthMultiplier * 100) .. "% Damage " .. (ScenarioInfo.Options.Option_DamageMultiplier * 100) .. "%", 20, '77F550', 20, 'lefttop')
-	    BroadcastMsg.TextMsg(string.rep(" ", 85) .. "Enemies spawn in " .. ScenarioInfo.Options.Option_BuildTime .. " seconds", 20, '77F550', 20, 'lefttop')
-		WaitSeconds(10.0)
+		WaitSeconds(10.0) -- Show Income Storage BuildRate BuildRange BuildCost modifiers and Build Restrictions of OP units
 		BroadcastMsg.TextMsg(string.rep(" ", 55) .. "", 20, '2F4607', 20, 'centertop')
 		BroadcastMsg.TextMsg(string.rep(" ", 55) .. "" .. GetModifiers() .. "", 20, 'FF2D00', 20, 'centertop')
 		BroadcastMsg.TextMsg(string.rep(" ", 55) .. "" .. GetBannedUnitsCount() .. "", 20, 'FF2D00', 20, 'centertop')
-
-		
-
-
 	end)
 end
 
@@ -75,6 +70,60 @@ end
 --		BroadcastMsg.TextMsg(string.rep(" ", 5) .. "Be on your guard. Be courageous. HQ out!", 													   		18, 'FFFFFF', 35, 'leftcenter')
 --	end)
 --end
+
+function GetDifficultyDialogue()
+	local Difficulty = nil
+	if ScenarioInfo.Options.Option_PlatoonWaveCount == 1 then
+		Difficulty = "Easy"
+	elseif ScenarioInfo.Options.Option_PlatoonWaveCount == 2 then
+		Difficulty = "Moderate"
+	elseif ScenarioInfo.Options.Option_PlatoonWaveCount == 3 then
+		Difficulty = "Hard"
+	end
+	return Difficulty
+end
+
+function GetAllFactionDialogue()
+	local AllFaction = nil
+	if ScenarioInfo.Options.Option_AllFactions == 0 then 
+		AllFaction = "No Prebuilds"
+	elseif ScenarioInfo.Options.Option_AllFactions == 1 then 
+		AllFaction = "3x T1 engineers"
+	elseif ScenarioInfo.Options.Option_AllFactions == 2 then 
+		AllFaction = "1x Acu"
+	elseif ScenarioInfo.Options.Option_AllFactions == 3 then 
+		AllFaction = "All Faction T1 Engineers"
+	elseif ScenarioInfo.Options.Option_AllFactions == 4 then 
+		AllFaction = "All Faction Acu's"
+	end
+	return AllFaction
+end
+
+function GetResourcesDialogue()
+	local Resources = nil
+	if ScenarioInfo.Options.Option_PlatoonWaveCount == 1 then
+		Resources = "Default Resources"
+	elseif ScenarioInfo.Options.Option_PlatoonWaveCount == 2 then
+		Resources = "More Hydro, Mass Points"
+	elseif ScenarioInfo.Options.Option_PlatoonWaveCount == 3 then
+		Resources = "Disabled Hydro's, Mass Points"
+	end
+	return Resources
+end
+
+function GetGameBreakerDialogue()
+	local Gamebreaker = nil
+	if ScenarioInfo.Options.Option_GameBreaker == 0 then
+		Difficulty = "Paragon Disabled"
+	elseif ScenarioInfo.Options.Option_GameBreaker == 1 then
+		Difficulty = "Yolona Oss Disabled"
+	elseif ScenarioInfo.Options.Option_GameBreaker == 2 then
+		Difficulty = "Paragon, Yolona Disabled"
+	elseif ScenarioInfo.Options.Option_GameBreaker == 3 then
+		Difficulty = "Gamebreakers Active"
+	end
+	return Gamebreaker
+end
 
 function GetModifiers()
 	Dialogue = "Why are you looking here, go do something!!"
