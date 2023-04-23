@@ -218,14 +218,7 @@ function CreateAirWave(ExtraHpMultiplier, SpeedMultiplier, WaveCount, FinalDesti
             Unit:SetTurnMult(SpeedMultiplier * 0.80)
             if ExtraHpMultiplier > 1 then
                 local Hp = Unit:GetMaxHealth()
-                if Unit:GetBlueprint().Veteran ~= nil then -- Look for VeteranTable -- Airscouts dont have Vet levels
-                    if Unit.Sync.VeteranLevel < 5 then -- if less then 5 then Set Veterancy
-                        VetLevelLeft = 5 - Unit.Sync.VeteranLevel
-                        for i = 1 , VetLevelLeft do
-                            Unit:SetVeterancy(1)
-                        end
-                    end
-                end
+                SetUpVeterancyLevels(Unit)
                 Unit:SetMaxHealth(Hp * ExtraHpMultiplier)
                 Unit:SetHealth(nil, (Hp * ExtraHpMultiplier))
             end
@@ -281,14 +274,7 @@ function CreateLandWave(ExtraHpMultiplier, SpeedMultiplier, WaveCount, FinalDest
             Unit:SetTurnMult(SpeedMultiplier)
             if ExtraHpMultiplier > 1 then
                 local Hp = Unit:GetMaxHealth()
-                if Unit:GetBlueprint().Veteran ~= nil then -- Look for VeteranTable -- Airscouts dont have Vet levels
-                    if Unit.Sync.VeteranLevel < 5 then -- if less then 5 then Set Veterancy
-                        VetLevelLeft = 5 - Unit.Sync.VeteranLevel
-                        for i = 1 , VetLevelLeft do
-                            Unit:SetVeterancy(1)
-                        end
-                    end
-                end
+                SetUpVeterancyLevels(Unit)
                 Unit:SetMaxHealth(Hp * ExtraHpMultiplier)
                 Unit:SetHealth(nil, (Hp * ExtraHpMultiplier))
             end
@@ -325,14 +311,7 @@ function CreateNavyWave(ExtraHpMultiplier, SpeedMultiplier, WaveCount, FinalDest
             Unit:SetTurnMult(SpeedMultiplier)
             if ExtraHpMultiplier > 1 then
                 local Hp = Unit:GetMaxHealth()
-                if Unit:GetBlueprint().Veteran ~= nil then -- Look for VeteranTable -- Airscouts dont have Vet levels
-                    if Unit.Sync.VeteranLevel < 5 then -- if less then 5 then Set Veterancy
-                        VetLevelLeft = 5 - Unit.Sync.VeteranLevel
-                        for i = 1 , VetLevelLeft do
-                            Unit:SetVeterancy(1)
-                        end
-                    end
-                end
+                SetUpVeterancyLevels(Unit)
                 Unit:SetMaxHealth(Hp * ExtraHpMultiplier)
                 Unit:SetHealth(nil, (Hp * ExtraHpMultiplier))
             end
@@ -347,6 +326,35 @@ function CreateNavyWave(ExtraHpMultiplier, SpeedMultiplier, WaveCount, FinalDest
         FormationNavy, 0)
 end
 
+function SetUpVeterancyLevels(Unit)
+    local UnitHasVetLevels = Unit:GetBlueprint().Veteran
+    local MaxVeterancyLevel = table.getsize(UnitHasVetLevels)
+
+    if UnitHasVetLevels ~= nil then -- Look for VeteranTable -- Airscouts dont have Vet levels so we can skip
+        local CurrentVetLevel = 0
+        if GetVeteranLevel(Unit) ~= nil then 
+            CurrentVetLevel = GetVeteranLevel(Unit) -- New VetLevel System
+        end
+        if Unit.Sync.VeteranLevel ~= nil then 
+            CurrentVetLevel = Unit.Sync.VeteranLevel    -- Old VetLevel System
+        end
+
+        if CurrentVetLevel < MaxVeterancyLevel then -- if less then 5 then Set Veterancy
+            VetLevelLeft = MaxVeterancyLevel - CurrentVetLevel
+            for i = 1 , VetLevelLeft do
+                Unit:SetVeterancy(1) -- keeps adding 1 vet level how it used to work         
+            end
+            -- If After Loop not max Vet then Set to max in one try
+            if GetVeteranLevel(Unit) < 5 then 
+                Unit:SetVeterancy(5)  -- Check if Max Vet or els try set vet to 5   
+            end
+        end
+    end
+end
+
+GetVeteranLevel = function(self)
+    return self.VetLevel
+end
 
 function GetCurrentLandRiftCount()
     local LandRifts = GetArmyBrain(SeraphimArmy):GetListOfUnits(categories.xac1101, false)

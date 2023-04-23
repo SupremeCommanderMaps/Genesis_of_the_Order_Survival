@@ -25,17 +25,17 @@ If the _Maps_ folder does not exist, create one. Merge the _Maps_ folder of the 
 All assets are licensed with [CC-BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 --[[ Bugs ]]--
-No Known bugs
+
 
 --[[ Future Plans ]]--
 
 End game Score screen / statistics
 Redo ArmyStrength 
-Update the HP damage buff to include shields 
-Update Damage buff to increase range weapons + firerate + projectile live
+* Partially done. Update the HP damage buff to include shields 
+* Partially done. Update Damage buff to increase range weapons + firerate + projectile live
 If Mods are used chance difficulty accordingly
 Make a Check: if A factory can build unit or els restrict unit  
-Make a Check: vanilla unit stats . Use that for Mod check values
+* Partially done. Make a Check: vanilla unit stats . Use that for Mod check values
 
 Move DefencObject and emergencyshield to Events 
 
@@ -235,4 +235,18 @@ Move DefencObject and emergencyshield to Events
 *   UnitBuffer 
 *       Shield Hp, Size Increases when Health Multipier Mod
 *       Weapon Damge Mod, Range Mod and Fire Rate mod
+
+---- Version 20 ----
+*   Restrictions
+*       Check for Buildrestrictions Succesfull or els Stop Game "To Counter the No buildrestriction Mods"
+*   UnitBuffer
+*       Fixed SetLifetime bugging out Lazor weapons. Should fix GC and Czar bugging out
+*       Fixed Error for Czar Shield ImpactMesh "Czar has ImpactMeshBig!"
+*       Fixed Set Veterancy "update for new Vet system"
+*   SeraphimInvasion
+*       Fixed Set Veterancy "update for new Vet system"
+*   NukeEvent 
+*       Fixed Deforming Land when Yolona's Spawning "Dont Spawn Buildings to close to Edge Map"
+
+
 

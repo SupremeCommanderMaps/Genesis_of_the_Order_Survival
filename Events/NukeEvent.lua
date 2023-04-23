@@ -36,11 +36,13 @@ function LaunchNuke()
     for i = 1, 3 do
         local SpawnNukeLauncher = ScenarioUtils.MarkerToPosition("nuke-" .. i)
 
-        local NukeLauncher = CreateUnitHPR( 'XSB2401', Army, SpawnNukeLauncher[1], SpawnNukeLauncher[2], SpawnNukeLauncher[3], 0, 0, 0)
+        local NukeLauncher = CreateUnitHPR( 'XSB2401', Army, SpawnNukeLauncher[1] , SpawnNukeLauncher[2], SpawnNukeLauncher[3] , 0, 0, 0)
 
-        local NewPosition = VECTOR3(SpawnNukeLauncher[1] - 800, SpawnNukeLauncher[2], SpawnNukeLauncher[3] - 440)
-        NukeLauncher:SetPosition(NewPosition, true)
-
+        ForkThread(function()
+            WaitSeconds(0.5)
+            local NewPosition = VECTOR3(SpawnNukeLauncher[1] - 800, SpawnNukeLauncher[2] + 40, SpawnNukeLauncher[3] - 440)
+            NukeLauncher:SetPosition(NewPosition, true)
+        end)
         table.insert(TableLaunchers, NukeLauncher)
     end
 

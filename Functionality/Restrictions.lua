@@ -5,12 +5,17 @@
 ---------- 							   For information see Readme						   	     ----------
 -----------------------------------------------------------------------------------------------------------
 
+local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')
 local ScenarioFramework = import('/lua/ScenarioFramework.lua')
+
+
 
 local EnergyFabricator = import(ScenarioInfo.MapPath .. 'Functionality/Restrictions/EnergyFabricator.lua')
 local EnergyStorage = import(ScenarioInfo.MapPath .. 'Functionality/Restrictions/EnergyStorage.lua')
 local MassFabricator = import(ScenarioInfo.MapPath .. 'Functionality/Restrictions/MassFabricator.lua')
 local MassStorage = import(ScenarioInfo.MapPath .. 'Functionality/Restrictions/MassStorage.lua')
+
+local BroadcastMsg = import(ScenarioInfo.MapPath .. 'Utilities/BroadcastMsg.lua')
 
 
 local ResouceGenerator = import(ScenarioInfo.MapPath .. 'Functionality/Restrictions/ResouceGenerator.lua')
@@ -34,6 +39,7 @@ function Setup(PlayerArmies)
 
 	SetupBuildRestrictions(PlayerArmies) 
 	ModCheck(PlayerArmies)
+	RestrictionActiveCheck(PlayerArmies)
 end
 
 function SetupBuildRestrictions(PlayerArmies)
@@ -47,6 +53,7 @@ function SetupBuildRestrictions(PlayerArmies)
 		for i, Army in PlayerArmies do
 			ScenarioFramework.AddRestriction(Army, categories.WALL)
 			ScenarioFramework.AddRestriction(Army, (categories.SCOUT * categories.LAND))
+
 			--ScenarioFramework.AddRestriction(Army, (categories.MASSFABRICATION * categories.TECH3) - categories.SUBCOMMANDER) -- categories.SUBCOMMANDER
 			--ScenarioFramework.RemoveBuildRestriction(Army, categories.uaa0101)	
 			if ScenarioInfo.Options.Option_GameBreaker == 0 then
@@ -62,7 +69,6 @@ function SetupBuildRestrictions(PlayerArmies)
 		end
 	end)
 end
-
 
 function ModCheck(PlayerArmies, LastArmyInList)
 	local InstalledMods = {}
@@ -91,8 +97,24 @@ function ModCheck(PlayerArmies, LastArmyInList)
 	end  
 
 	if table.getn(__active_mods) > 0 then
-		GetModUnitsSpecifics(PlayerArmies, ModUnitIds)
+		--GetModUnitsSpecifics(PlayerArmies, ModUnitIds)
 	end
+end
+
+function RestrictionActiveCheck(PlayerArmies)
+	ForkThread(function()
+		WaitSeconds(6)
+		for i, Army in PlayerArmies do
+			Wall = CreateUnitHPR('uab5101', Army, 2, 20, 2, 0, 0, 0)
+			WaitSeconds(0.5)
+			ListUnits = GetArmyBrain(Army):GetListOfUnits(categories.WALL, false)
+			WallCount = table.getn(ListUnits)
+
+			if WallCount > 0 then
+				GameHasBeenTamperedWith(PlayerArmies)
+			end
+		end
+	end)
 end
 
 function GetModUnitsSpecifics(PlayerArmies, ModUnitIds)
@@ -194,3 +216,27 @@ function GetWeaponCategories(PlayerArmies, UnitId, TechLevel)
 
 	return WeaponCategoryTable
 end 
+
+function GameHasBeenTamperedWith(PlayerArmies)
+	for i, Army in PlayerArmies do
+		GetArmyBrain(Army):OnDefeat()
+
+		Dialog1 = {
+            {displayTime = 80, text =
+            " \n\n\n\n\n\n\n\n\n\n ",}
+        }
+        Dialog2 = {
+            {displayTime = 80, text =
+            "Build Restrictions Failed.\n\n\n\n\n\n\n\n\nTerminating Game.\n                       Try disabling Mods!",}
+		}
+		for z = 1, 5 do 
+			BroadcastMsg.DisplayDialogBox("right", Dialog1, false)
+		end
+		BroadcastMsg.DisplayDialogBox("right", Dialog2, false)
+
+		ForkThread(function()
+			WaitSeconds(1)
+			EndGame()
+		end)
+	end
+end

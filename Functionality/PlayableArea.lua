@@ -18,7 +18,7 @@ function SetArea()
     ScenarioFramework.SetIgnorePlayableRect(ArmyEnemy, true)
     ScenarioFramework.SetIgnorePlayableRect(ArmyHq, true)
 
-    if 	ScenarioInfo.Debug then
+    if ScenarioInfo.Debug then
         ScenarioFramework.SetPlayableArea('AREA_1', false)
     end
 end

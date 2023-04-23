@@ -18,9 +18,37 @@ function HealthMultiplier(Unit)
 			if LogStats == true then 
 				LOG("UnitBuffer: Unit not IsDead: UnitName:" .. repr(Unit:GetBlueprint().General.UnitName))
 				LOG("UnitBuffer: UnitBP Has VetranLevels:" .. repr(Unit:GetBlueprint().Veteran))
-				LOG("UnitBuffer: UnitCurrent VetLevel:" .. repr(Unit.Sync.VeteranLevel))
+				LOG("UnitBuffer: UnitBP Max VetranLevels:" .. repr(table.getsize(Unit:GetBlueprint().Veteran)))                
+				LOG("UnitBuffer: UnitCurrent New VetLevel system:" .. repr(Unit.VetLevel))
+                LOG("UnitBuffer: UnitCurrent Old VeteranLevel system:" .. repr(Unit.Sync.VeteranLevel))
 			end
 
+
+            local UnitHasVetLevels = Unit:GetBlueprint().Veteran
+            local MaxVeterancyLevel = table.getsize(UnitHasVetLevels)
+
+            if UnitHasVetLevels ~= nil then -- Look for VeteranTable -- Airscouts dont have Vet levels so we can skip
+                local CurrentVetLevel = 0
+                if GetVeteranLevel(Unit) ~= nil then 
+                    CurrentVetLevel = GetVeteranLevel(Unit) -- New VetLevel System
+                end
+                if Unit.Sync.VeteranLevel ~= nil then 
+                    CurrentVetLevel = Unit.Sync.VeteranLevel    -- Old VetLevel System
+                end
+
+				if CurrentVetLevel < MaxVeterancyLevel then -- if less then 5 then Set Veterancy
+					VetLevelLeft = MaxVeterancyLevel - CurrentVetLevel
+					for i = 1 , VetLevelLeft do
+						Unit:SetVeterancy(1) -- keeps adding 1 vet level how it used to work         
+					end
+                    -- If After Loop not max Vet then Set to max in one try
+                    if GetVeteranLevel(Unit) < 5 then 
+						Unit:SetVeterancy(5)  -- Check if Max Vet or els try set vet to 5   
+                    end
+				end
+			end
+
+            --[[    Old Vet system
 			if Unit:GetBlueprint().Veteran ~= nil then -- Look for VeteranTable -- Airscouts dont have Vet levels
 				if Unit.Sync.VeteranLevel < 5 then -- if less then 5 then Set Veterancy
 					VetLevelLeft = 5 - Unit.Sync.VeteranLevel
@@ -29,6 +57,7 @@ function HealthMultiplier(Unit)
 					end
 				end
 			end
+            ]]
 			Unit:SetMaxHealth(BaseHealthUnit * ScenarioInfo.Options.Option_HealthMultiplier)
 			Unit:SetHealth(Unit, Unit:GetMaxHealth())
 		end
@@ -39,6 +68,10 @@ function HealthMultiplier(Unit)
 		end
 	end
 	return Unit
+end
+
+GetVeteranLevel = function(self)
+    return self.VetLevel
 end
 
 function DamageMultiplier(Unit)
@@ -76,10 +109,10 @@ function DamageMultiplier(Unit)
 				end
 				local OldCreateProjectileAtMuzzle = Weapon.CreateProjectileAtMuzzle
 				function CustomCreateProjectileAtMuzzle(self, muzzle)
-					local Projectile = OldCreateProjectileAtMuzzle(self, muzzle)
-						
+					local Projectile = OldCreateProjectileAtMuzzle(self, muzzle)					
+					if Projectile ~= nil then -- Check if Projectile. Lazor weapons dont have Lifetime
 						Projectile:SetLifetime(10)	
-	
+					end
 				end
 				Weapon.CreateProjectileAtMuzzle = CustomCreateProjectileAtMuzzle
 		end
@@ -150,6 +183,7 @@ function CreateNewShield(Unit)
 		local BubbleShield = "Bubble"
 		local GetImpactEffects = Unit:GetBlueprint().Defense.Shield.ImpactEffects
 		local GetImpactMesh = Unit:GetBlueprint().Defense.Shield.ImpactMesh
+		local GetImpactMeshBig = Unit:GetBlueprint().Defense.Shield.ImpactMeshBig -- Czar 
 		local GetMesh = Unit:GetBlueprint().Defense.Shield.Mesh -- only on bubbleshield
 		local GetMeshZ = Unit:GetBlueprint().Defense.Shield.MeshZ -- only on bubbleshield
 		local GetRegenAssist = Unit:GetBlueprint().Defense.Shield.RegenAssistMult
@@ -176,6 +210,7 @@ function CreateNewShield(Unit)
 		local BpShield = {
             ImpactEffects = GetImpactEffects,
             ImpactMesh = GetImpactMesh,
+			ImpactMeshBig = GetImpactMeshBig,
             Mesh = GetMesh,
             MeshZ = GetMeshZ,
             RegenAssistMult = GetRegenAssist,
@@ -201,7 +236,7 @@ function ForkThreadShieldHpToCustomName(Unit, Type)
 			end
 			local CurrentHpShield = Unit.MyShield:GetHealth()
 			local MaxHpShield = Unit.MyShield:GetMaxHealth()
-			Unit:SetCustomName("Shield HP: " .. string.format("%.0f", CurrentHpShield) .. "/" .. string.format("%.0f", MaxHpShield).. " ShieldType: " .. repr(Type))
+			Unit:SetCustomName("Shield:" .. string.format("%.0f", CurrentHpShield) .. "/" .. string.format("%.0f", MaxHpShield).. " Type:" .. repr(Type))
 
 
 			WaitSeconds(1)
