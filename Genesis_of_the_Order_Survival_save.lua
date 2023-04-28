@@ -6599,9 +6599,9 @@ Scenario = {
             },
         },
         --[[                                                                           ]]--
-        --[[  ARMY_ENEMY_AEON_BOSS                                                     ]]--
+        --[[  ARMY_ENEMY_ORDER_BOSS                                                     ]]--
         --[[                                                                           ]]--
-        ['ARMY_ENEMY_AEON_BOSS'] = 
+        ['ARMY_ENEMY_ORDER_BOSS'] = 
         {
             personality = '',
             plans = '',

@@ -5,7 +5,7 @@
 ---------- 							   For information see Readme						   	     ----------
 -----------------------------------------------------------------------------------------------------------
 
-ScenarioInfo.MapPath = '/maps/genesis_of_the_order_survival.v0020/'
+ScenarioInfo.MapPath = '/maps/genesis_of_the_order_survival.v0021/'
 
 local Statistics = import(ScenarioInfo.MapPath .. 'Events/Statistics.lua')
 

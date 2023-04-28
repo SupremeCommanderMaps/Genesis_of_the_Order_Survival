@@ -248,5 +248,15 @@ Move DefencObject and emergencyshield to Events
 *   NukeEvent 
 *       Fixed Deforming Land when Yolona's Spawning "Dont Spawn Buildings to close to Edge Map"
 
-
+---- Version 21 ----
+*   UnitBuffer
+*       Updated Set Veterancy Level 
+*   OrderBoss 
+*       Fixed Boss not Getting full Vet
+*       Made all the Modules into single lua files
+*       All Module Units have own destroy thread "All units should now die when boss dies"
+*       Thread for the mobile t3 arty 
+*       More sams in torso Final Boss
+*   Recall
+*       Recall timer dialogue into Dialogue Message Box 
 

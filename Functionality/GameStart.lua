@@ -18,15 +18,17 @@ local SpawnEnemyLand = import(ScenarioInfo.MapPath .. 'Generator/SpawnEnemyLand.
 local SpawnEnemyNavy = import(ScenarioInfo.MapPath .. 'Generator/SpawnEnemyNavy.lua')
 
 function WhySoSerious()
-	Dialogue.GetTimedDialogue()
-	DefenceObject.SpawnDefenceObject()
-	EmergencyShield.SpawnEmergencyBeacon()
+    if not ScenarioInfo.Debug then
+	    Dialogue.GetTimedDialogue()
+	    DefenceObject.SpawnDefenceObject()
+	    EmergencyShield.SpawnEmergencyBeacon()
+    end
 
 
 	AeonBoss.LittleBehemoth()
 	NukeEvent.StartNukeEvent()
 	ReinforcementDrop.StartReinforcementDrop()
-	ForkThread(SpawnEnemyLand.GreasingTheWheels)
+    ForkThread(SpawnEnemyLand.GreasingTheWheels)
 	ForkThread(SpawnEnemyNavy.IDontGiveAShip)
 	ForkThread(SpawnEnemyAir.TakeFlight)
 end

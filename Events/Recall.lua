@@ -28,6 +28,7 @@ local DialogueList = import(ScenarioInfo.MapPath .. 'Resources/DialogueList.lua'
 
 RecallState = 0
 RecallActive = false
+RecallThreadActive = false
 
 local EnemyArmies = GameSetup.EnemyArmies
 local PlayerArmies = GameSetup.PlayerArmies
@@ -168,42 +169,9 @@ end
 function RecallThread(PlayerArmies, RecallNumber)
     local AllPlayersInsideRecall = false
     local RecallTimer = 10
-    local CountDownTimer = 60
+    local CountDownTimer = 90
+    local DialogueInterval = 90
     
-    if FirstRecallDialog == false then--[[All Recall Dialog]]--
-        Dialog = {
-            {displayTime = 80, text =
-            "All Main Commanders to Recall Zone.\n\n\n\nThis is a OPTIONAL recall.\n Next recall is in 10 minutes",}
-        }
-    end    
-    if FirstRecallDialog == true then --[[First time Dialog]]--
-        Dialog = {
-            {displayTime = 80, text =
-            "All Main Commanders to Recall Zone. \nSeraphim invasion is imminent!!!\n\n\nThis is a OPTIONAL recall.\n Next recall is in 10 minutes",}
-        }
-        FirstRecallDialog = false
-    end
-
-    if RecallNumber == 1 then --[[When All Seraphim Rifts are killed Dialog]]--
-        Dialog = {
-            {displayTime = 900, text =
-            "\n\n\n\n\n\n\n",}
-        }
-        BroadcastMsg.DisplayDialogBox("right", Dialog, false)
-        Dialog = {
-            {displayTime = 900, text =
-            "It seems like all Rifts are sealed. \n\nYou can recall safely now.\n\nBut I am afraid we haven't seen the last of ZanGoattheZeGary!!. \n\n",}
-        }
-    end
-
-    BroadcastMsg.DisplayDialogBox("right", Dialog, false)
-    
-    if RecallNumber ~= 1 then 
-        BroadcastMsg.TextMsg(string.rep(" ", 29) .. "Game will continue in: ", 45, 'e80a0a', 75, 'lefttop')
-    end
-
-
-
     while true do 
         -- All Commanders inside recallarea start recall timer
         if CheckAll(InsideRecall) == true then
@@ -221,9 +189,9 @@ function RecallThread(PlayerArmies, RecallNumber)
 
         -- If timer = 0 then Players win
         if RecallTimer == - 1 then
-            
+
             VictoryWooopWooop()             
-            
+
             -- Update Status to Player Victory
             RecallStop = 1
             RecallState = 2
@@ -232,23 +200,87 @@ function RecallThread(PlayerArmies, RecallNumber)
 
         -- Text and Timer for Optional Recall
         if RecallNumber == 0 then
-            BroadcastMsg.TextMsg(string.rep(" ", 45) , 20, 'e80a0a', 0.5, 'lefttop')
-            BroadcastMsg.TextMsg(string.rep(" ", 40) .. "" .. CountDownTimer, 50, 'e80a0a', 0.20, 'lefttop')
-
             -- If timer = 0 then Stop Recall
             if CountDownTimer <= 0 then
                 RecallStop = 1 
                 RecallActive = false
+                FirstRecallDialog = false
+                RecallThreadActive = false
                 -- Update Status to Next Stage
                 RecallState = 1
                 NextRecallTimer()
                 break
             end
 
+            if RecallNumber ~= 1 then 
+
+                if CountDownTimer == DialogueInterval then 
+                    if CountDownTimer > 9 then 
+                        local DialogueTime = 12
+                        BroadCastDialogue(FirstRecallDialog, CountDownTimer, RecallNumber, DialogueTime)
+                        DialogueInterval = DialogueInterval - 10
+                    end
+                end
+                if CountDownTimer < 10 then 
+                    local DialogueTime = 1.3
+                    BroadCastDialogue(FirstRecallDialog, CountDownTimer, RecallNumber, DialogueTime)
+                end
+            end
+
             CountDownTimer = CountDownTimer - 1
         end
-        
-        WaitSeconds(1.2)
+        if RecallNumber == 1 then 
+            BroadCastDialogue(FirstRecallDialog, CountDownTimer, RecallNumber)
+        end
+        WaitSeconds(1.1)
+    end
+end
+
+function BroadCastDialogue(FirstRecallDialog, CountDownTimer, RecallNumber, DialogueTime)
+    if RecallNumber ~= 1 then 
+        if FirstRecallDialog == false then--[[All Recall Dialog]]--
+            Dialog = {
+                {displayTime = DialogueTime, text =
+                "\n\n\n\n\n\n\n\n\n",}
+            }
+            for _ = 1, 2 do
+                BroadcastMsg.DisplayDialogBox("right", Dialog, false)
+            end
+            Dialog = {
+                {displayTime = DialogueTime, text =
+                "All Main Commanders to Recall Zone.\n\nThis is a OPTIONAL recall.\n Next recall is in 10 minutes.\n\n\nGame will continue in: \n                               ".. CountDownTimer.." Seconds",}
+            }
+            BroadcastMsg.DisplayDialogBox("right", Dialog, false)
+
+        end    
+        if FirstRecallDialog == true then --[[First time Dialog]]--
+            Dialog = {
+                {displayTime = DialogueTime, text =
+                "\n\n\n\n\n\n\n\n\n\n\n",}
+            }
+            for _ = 1, 2 do
+                BroadcastMsg.DisplayDialogBox("right", Dialog, false)
+            end
+            Dialog = {
+                {displayTime = DialogueTime, text =
+                "All Main Commanders to Recall Zone. \nSeraphim invasion is imminent!!!\n\n\nThis is a OPTIONAL recall.\n Next recall is in 10 minutes.\n\n\nGame will continue in: \n                               ".. CountDownTimer.." Seconds",}
+            }
+            BroadcastMsg.DisplayDialogBox("right", Dialog, false)
+        end
+    end
+    if RecallNumber == 1 then --[[When All Seraphim Rifts are killed Dialog]]--
+        Dialog = {
+            {displayTime = 900, text =
+            "\n\n\n\n\n\n\n",}
+        }
+        for _ = 1, 3 do
+            BroadcastMsg.DisplayDialogBox("right", Dialog, false)
+        end
+        Dialog = {
+            {displayTime = 900, text =
+            "It seems like all Rifts are sealed. \n\nYou can recall safely now.\n\nBut I am afraid we haven't seen the last of ZanGoattheZeGary!!. \n\n",}
+        }
+        BroadcastMsg.DisplayDialogBox("right", Dialog, false)
     end
 end
 
@@ -455,7 +487,7 @@ function VictoryWooopWooop()
         }
         Dialog2 = {
             {displayTime = 80, text =
-            "Good job, Commanders.\nRecall was successful.\nThe Order's project has bin destroyed.\n\n\n I hope you enjoyed the game.\nPlease give me a Review in the Map Vault.\n                  Commander Jammer out!",}
+            "Good job, Commanders.\nRecall was successful.\nThe Order's project has been destroyed.\n\n\n I hope you enjoyed the game.\nPlease give me a Review in the Map Vault.\n                  Commander Jammer out!",}
         }
 
         for z = 1, 5 do 

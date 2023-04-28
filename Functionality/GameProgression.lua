@@ -10,6 +10,7 @@ local ScenarioFramework = import('/lua/ScenarioFramework.lua')
 local Utilities = import('/lua/utilities.lua')
 
 local AeonBoss = import(ScenarioInfo.MapPath .. 'Events/AeonBoss.lua')
+local BossThread = import(ScenarioInfo.MapPath .. 'Events/Modules/GcBoss/BossThread.lua')
 local NukeEvent = import(ScenarioInfo.MapPath .. 'Events/NukeEvent.lua')
 local Recall = import(ScenarioInfo.MapPath .. 'Events/Recall.lua')
 local SeraphimRifts = import(ScenarioInfo.MapPath .. 'Events/SeraphimRifts.lua')
@@ -34,11 +35,11 @@ local StartSeraWaves = false
 function DoOrDoNotThereIsNoTry()
     ForkThread(function()
         while true do 
-            local AeonBossStatus = AeonBoss.BossDeath
+            local BossStatus = BossThread.FinalBossDeath
             local RecallState = Recall.RecallState
 
             -- Start First Recall
-            if AeonBossStatus == 1 then --[[Default = 1]]--  0 = Do nothing / when 1 = Start Recall
+            if BossStatus == true then -- If final boss death then start Seraphim invasion
                 if FirstRecall == false then 
                     WaitSeconds(10)
                     --Entropy: All operational objectives have been completed. Begin preparations to recall. We're getting you off that rock. HQ out.
